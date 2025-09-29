@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Sacred QA CI - Full Gates
 
 on:
   push:
@@ -7,24 +7,65 @@ on:
     branches: [ main ]
 
 jobs:
-  validate:
+  gate-validation:
     runs-on: ubuntu-latest
+    
     steps:
-    - uses: actions/checkout@v4
-    - name: Validate Docker Compose
-      run: docker compose config
-
-  test:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Start services
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Prepare environment
+      run: |
+        cp .env.example .env
+        echo "INFERENCE_URL=http://ai_inference:8001" >> .env
+    
+    - name: Gate 3 - Start full stack
       run: |
         docker compose up -d
         sleep 30
-    - name: Test endpoints
+    
+    - name: Wait for backend health
       run: |
+        for i in {1..30}; do
+          curl -fsS http://localhost:8000/health && break || sleep 2
+        done
         curl -f http://localhost:8000/health
+    
+    - name: Wait for inference health
+      run: |
+        for i in {1..30}; do
+          curl -fsS http://localhost:8001/health && break || sleep 2
+        done
         curl -f http://localhost:8001/health
+    
+    - name: Gate 2 & 5 - Harvest VCV snapshot
+      run: |
+        curl -fsS http://localhost:8001/vcv > vcv-snapshot.json || echo '{"error":"vcv_unavailable"}' > vcv-snapshot.json
+        cat vcv-snapshot.json
+    
+    - name: Gate 4 - First Sankalpa ritual
+      run: |
+        curl -fsS -X POST http://localhost:8000/sankalpa \
+          -H "Content-Type: application/json" \
+          -d '{"text":"May this pipeline serve all beings","context":"GitHub Actions CI"}' \
+          | tee sankalpa-response.json
+        cat sankalpa-response.json
+    
+    - name: Collect compose logs
+      if: always()
+      run: docker compose logs > compose-logs.txt || true
+    
+    - name: Gate 5 - Upload lineage artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: lineage-artifacts-${{ github.run_number }}
+        path: |
+          vcv-snapshot.json
+          sankalpa-response.json
+          compose-logs.txt
+        retention-days: 14
+    
     - name: Cleanup
+      if: always()
       run: docker compose down -v

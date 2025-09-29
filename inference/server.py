@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
+from datetime import datetime, timezone
 import uvicorn
 
 app = FastAPI()
@@ -11,6 +12,20 @@ class PredictionRequest(BaseModel):
 @app.get("/health")
 def health():
     return {"status": "healthy", "service": "ai-inference"}
+
+@app.get("/vcv")
+def vcv():
+    return {
+        "schema_version": "0.1.0",
+        "model_path": "mock://no-model",
+        "device": "mock",
+        "supported_formats": ["chat_completion"],
+        "max_tokens": 8192,
+        "health_check_url": "/health",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "inputs": [],
+        "outputs": []
+    }
 
 @app.post("/predict")
 def predict(req: PredictionRequest):
