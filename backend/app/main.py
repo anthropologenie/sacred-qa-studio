@@ -37,8 +37,7 @@ app.add_middleware(
 @app.on_event("startup")
 async def harvest_vcv():
     """Gate 2: Harvest VCV from inference service on startup"""
-    inference_url = os.getenv("INFERENCE_URL", "http://ai_inference:8001")
-    
+    inference_url = os.getenv("INFERENCE_URL", f"http://{os.getenv('AI_SERVICE_HOST', 'ai-inference')}:{os.getenv('AI_SERVICE_PORT', '8001')}")    
     try:
         async with httpx.AsyncClient(timeout=10) as client:
             response = await client.get(f"{inference_url}/vcv")
