@@ -1,0 +1,30 @@
+
+{
+  "folders": [{ "path": "." }],
+  "settings": {
+    "files.autoSave": "onFocusChange",
+    "editor.formatOnSave": true,
+    "python.formatting.provider": "black",
+    "terminal.integrated.splitCwd": "workspaceRoot",
+    "extensions.recommendations": [
+      "ms-azuretools.vscode-docker",
+      "ms-python.python",
+      "ms-python.black-formatter",
+      "ms-vscode-remote.remote-wsl",
+      "eamodio.gitlens",
+      "GitLab.gitlab-workflow",
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint"
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      { "label": "compose:up", "type": "shell", "command": "docker-compose --env-file .env.local.compose up -d" },
+      { "label": "compose:up:override", "type": "shell", "command": "docker-compose --env-file .env.local.compose -f docker-compose.yml -f docker-compose.override.yml up -d" },
+      { "label": "compose:down", "type": "shell", "command": "docker-compose down" },
+      { "label": "db:migrate", "type": "shell", "command": "cd backend && ./migrate.sh" },
+      { "label": "dev:web", "type": "shell", "command": "pnpm -C apps/web dev" }
+    ]
+  }
+}

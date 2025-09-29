@@ -1,0 +1,7 @@
+
+<type>(<scope>): <short summary>
+# Example: feat(api): add adaptive trust scoring
+
+Sankalpa: <why this change was needed>
+Kartavya: <how this change was done>
+Lineage: <impact on system/workflow/SmṛtiTree>

@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  postgres:
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - postgres_password
+
+  backend:
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
+    secrets:
+      - postgres_password
+      - jwt_secret
+
+secrets:
+  postgres_password:
+    external: true
+  jwt_secret:
+    external: true

@@ -1,0 +1,12 @@
+{
+  "name": "sacred-qa-studio",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "prepare": "husky install",
+    "dev:web": "pnpm -C apps/web dev",
+    "dev:api": "cd backend && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+  }
+}

@@ -1,0 +1,20 @@
+
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+commit_msg_file=$1
+commit_msg=$(cat "$commit_msg_file")
+
+# Conventional header
+echo "$commit_msg" | grep -qE '^(feat|fix|chore|docs|test|refactor|style|perf|build)(\([a-zA-Z0-9_-]+\))?: .+' || {
+  echo "❌ Conventional Commit header missing (e.g., feat(api): ... )"
+  exit 1
+}
+
+for section in Sankalpa Kartavya Lineage; do
+  echo "$commit_msg" | grep -q "$section:" || {
+    echo "❌ Missing required section: $section:"
+    exit 1
+  }
+done
+echo "✅ Commit message validated."
