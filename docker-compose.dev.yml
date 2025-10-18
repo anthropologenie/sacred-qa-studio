@@ -1,0 +1,19 @@
+version: "3.9"
+services:
+  backend:
+    build: apps/backend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes: [ "./apps/backend:/code" ]
+    working_dir: /code
+    environment:
+      - PYTHONUNBUFFERED=1
+    ports: [ "8000:8000" ]
+  frontend:
+    build: apps/frontend
+    command: npm run dev
+    volumes: [ "./apps/frontend:/usr/src/app" ]
+    working_dir: /usr/src/app
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on: [ backend ]
+    ports: [ "3000:3000" ]

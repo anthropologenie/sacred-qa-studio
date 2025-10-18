@@ -2,8 +2,10 @@ from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from sqlalchemy.sql import func
 from ..core.database import Base
 
+
 class TestCase(Base):
     __tablename__ = "test_cases"
+    __table_args__ = {"schema": "app"}
     
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)

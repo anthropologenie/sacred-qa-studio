@@ -1,6 +1,8 @@
 
 services:
   postgres:
+    env_file:
+      - .env.local.compose
     image: postgres:15-alpine
     container_name: sacred_qa_postgres
     restart: unless-stopped
@@ -8,11 +10,16 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-ai_qa_platform}
       POSTGRES_USER: ${POSTGRES_USER:-admin}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secure_password_123}
+      POSTGRES_HOST_AUTH_METHOD: md5
       # Additional settings for better initialization
       POSTGRES_INITDB_ARGS: "--encoding=UTF8"
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
+    command: 
+      - "postgres"
+      - "-c"
+      - "password_encryption=md5"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       # Optional: Add init scripts if needed
@@ -79,6 +86,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    env_file:
+      - .env.local.compose
     image: sacred-qa/backend:latest
     container_name: sacred_qa_backend
     restart: unless-stopped
@@ -101,6 +110,7 @@ services:
       # AI Service configuration
       AI_SERVICE_HOST: ai-inference
       AI_SERVICE_PORT: 8001
+      INFERENCE_URL: http://ai-inference:8001
       
       # Application settings
       NODE_ENV: ${NODE_ENV:-development}
